@@ -39,6 +39,7 @@ func TestLocaleHas(t *testing.T) {
 
 	assert.True(t, l.Has("foo"))
 	assert.True(t, l.Has("baz.qux"))
+	assert.True(t, l.Has("empty"))
 	assert.False(t, l.Has("baz.random"))
 }
 
@@ -48,6 +49,8 @@ func TestLocaleInterpolate(t *testing.T) {
 
 	out := l.N("baz.ducks", 1, 1)
 	assert.Equal(t, "1 duck", out)
+	assert.Equal(t, "", l.N("baz.ducks", 0))
+	assert.Equal(t, "", l.T("empty"))
 }
 
 func TestLocalWithContext(t *testing.T) {
@@ -92,9 +95,11 @@ func SampleLocaleData() []byte {
 				"other": "%{count} mice"
 			},
 			"ducks": {
+				"zero": "",
 				"one": "%d duck",
 				"other": "%d ducks"
 			}
-		}
+		},
+        "empty": ""
 	}`)
 }

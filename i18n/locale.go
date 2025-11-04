@@ -97,12 +97,13 @@ func GetLocale(ctx context.Context) *Locale {
 
 func interpolate(key string, d *Dict, args ...any) string {
 	var s string
-	s, args = extractDefault(args)
+	var hasDefault bool
+	s, args, hasDefault = extractDefault(args)
+	if !hasDefault && d == nil {
+		return missing(key)
+	}
 	if d != nil {
 		s = d.value
-	}
-	if s == "" {
-		return missing(key)
 	}
 	if len(args) > 0 {
 		switch arg := args[0].(type) {
@@ -115,13 +116,13 @@ func interpolate(key string, d *Dict, args ...any) string {
 	return s
 }
 
-func extractDefault(args []any) (string, []any) {
+func extractDefault(args []any) (string, []any, bool) {
 	for i, arg := range args {
 		if dt, ok := arg.(DefaultText); ok {
-			return string(dt), append(args[:i], args[i+1:]...)
+			return string(dt), append(args[:i], args[i+1:]...), true
 		}
 	}
-	return "", args
+	return "", args, false
 }
 
 func missing(key string) string {
